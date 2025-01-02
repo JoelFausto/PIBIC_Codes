@@ -1,0 +1,679 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "collapsed_sections": [
+        "CKMEWyLrDbqt"
+      ],
+      "toc_visible": true,
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/JoelFausto/PIBIC_Codes/blob/main/%5BPIBIC%5D%20Ataque%20de%20Infer%C3%AAncia%20de%20Atributo%201.0\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### Importando bibliotecas"
+      ],
+      "metadata": {
+        "id": "CKMEWyLrDbqt"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from google.colab import drive\n",
+        "drive.mount('/content/drive')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "lPoL13i-3Qhp",
+        "outputId": "fb1aa296-670c-41cf-a03f-a350949a5bc9"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Mounted at /content/drive\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install plotly --upgrade"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "s6QxpiIGDar8",
+        "outputId": "2bb28bed-ec49-4d29-cd78-04a3bef5b402"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: plotly in /usr/local/lib/python3.10/dist-packages (5.24.1)\n",
+            "Requirement already satisfied: tenacity>=6.2.0 in /usr/local/lib/python3.10/dist-packages (from plotly) (9.0.0)\n",
+            "Requirement already satisfied: packaging in /usr/local/lib/python3.10/dist-packages (from plotly) (24.2)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install dask"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ioAxjsibDZSz",
+        "outputId": "afd6696c-a8b0-4c0b-b35e-87c59f4d00ef"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: dask in /usr/local/lib/python3.10/dist-packages (2024.10.0)\n",
+            "Requirement already satisfied: click>=8.1 in /usr/local/lib/python3.10/dist-packages (from dask) (8.1.7)\n",
+            "Requirement already satisfied: cloudpickle>=3.0.0 in /usr/local/lib/python3.10/dist-packages (from dask) (3.1.0)\n",
+            "Requirement already satisfied: fsspec>=2021.09.0 in /usr/local/lib/python3.10/dist-packages (from dask) (2024.10.0)\n",
+            "Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.10/dist-packages (from dask) (24.2)\n",
+            "Requirement already satisfied: partd>=1.4.0 in /usr/local/lib/python3.10/dist-packages (from dask) (1.4.2)\n",
+            "Requirement already satisfied: pyyaml>=5.3.1 in /usr/local/lib/python3.10/dist-packages (from dask) (6.0.2)\n",
+            "Requirement already satisfied: toolz>=0.10.0 in /usr/local/lib/python3.10/dist-packages (from dask) (0.12.1)\n",
+            "Requirement already satisfied: importlib-metadata>=4.13.0 in /usr/local/lib/python3.10/dist-packages (from dask) (8.5.0)\n",
+            "Requirement already satisfied: zipp>=3.20 in /usr/local/lib/python3.10/dist-packages (from importlib-metadata>=4.13.0->dask) (3.21.0)\n",
+            "Requirement already satisfied: locket in /usr/local/lib/python3.10/dist-packages (from partd>=1.4.0->dask) (1.0.0)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "import dask.dataframe as dd"
+      ],
+      "metadata": {
+        "id": "hNRIdM-02vyg",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "408ae9ab-3e7d-43f3-8a1d-a17085a8b783"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "/usr/local/lib/python3.10/dist-packages/dask/dataframe/__init__.py:42: FutureWarning: \n",
+            "Dask dataframe query planning is disabled because dask-expr is not installed.\n",
+            "\n",
+            "You can install it with `pip install dask[dataframe]` or `conda install dask`.\n",
+            "This will raise in a future version.\n",
+            "\n",
+            "  warnings.warn(msg, FutureWarning)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from collections import Counter"
+      ],
+      "metadata": {
+        "id": "i7rwjldFm8Qa"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### Dados"
+      ],
+      "metadata": {
+        "id": "3IKXcBUqmIrk"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "pd.set_option('display.max_columns', None)"
+      ],
+      "metadata": {
+        "id": "-Ora7GEav3kW"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Carregando dataset do Drive (O Colab não suporta upload de datasets muito grandes, por isso deve vir direto do Drive)\n",
+        "microdados = pd.read_parquet('/content/drive/MyDrive/PIBIC/dataCenso2018_colunasEspecificas.parquet')"
+      ],
+      "metadata": {
+        "id": "SLDg9xtcmL_c"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### Ataque de Inferência de Atributo"
+      ],
+      "metadata": {
+        "id": "FQX0E1JHmvbJ"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#### Código baseado nos conceitos matemáticos (TED)"
+      ],
+      "metadata": {
+        "id": "a-6UZYWGIwkW"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def suc_prior_deterministic(data, sensitive_attr):\n",
+        "    \"\"\"\n",
+        "    Sucesso determinístico a priori do adversário em um ataque ACU.\n",
+        "    \"\"\"\n",
+        "    sensitive_values = data[sensitive_attr].unique()\n",
+        "    return 1 if len(sensitive_values) == 1 else 0\n",
+        "\n",
+        "def suc_post_deterministic(data, qid_attrs, sensitive_attr):\n",
+        "    \"\"\"\n",
+        "    Sucesso determinístico a posteriori do adversário em um ataque ACU.\n",
+        "    \"\"\"\n",
+        "    groups = data.groupby(qid_attrs)\n",
+        "    total_records = len(data)\n",
+        "    success_count = 0\n",
+        "\n",
+        "    for _, group in groups:\n",
+        "        if len(group[sensitive_attr].unique()) == 1:\n",
+        "            success_count += len(group)\n",
+        "\n",
+        "    return success_count / total_records\n",
+        "\n",
+        "def suc_prior_probabilistic(data, sensitive_attr):\n",
+        "    \"\"\"\n",
+        "    Sucesso probabilístico a priori do adversário em um ataque ACU.\n",
+        "    \"\"\"\n",
+        "    value_counts = data[sensitive_attr].value_counts()\n",
+        "    total_records = len(data)\n",
+        "    return value_counts.max() / total_records if total_records > 0 else 0\n",
+        "\n",
+        "def suc_post_probabilistic(data, qid_attrs, sensitive_attr):\n",
+        "    \"\"\"\n",
+        "    Sucesso probabilístico a posteriori do adversário em um ataque ACU.\n",
+        "    \"\"\"\n",
+        "    groups = data.groupby(qid_attrs, dropna=False)  # Inclui NaN como grupo distinto\n",
+        "    total_records = len(data)\n",
+        "    total_success = 0\n",
+        "\n",
+        "    for _, group in groups:\n",
+        "        group_size = len(group)\n",
+        "        if group_size > 0:\n",
+        "            value_counts = group[sensitive_attr].value_counts(dropna=False)  # Inclui NaN ao contar\n",
+        "            total_success += value_counts.max()\n",
+        "\n",
+        "    return total_success / total_records if total_records > 0 else 0\n",
+        "\n",
+        "def degradation_privacy_deterministic(data, qid_attrs, sensitive_attr):\n",
+        "    \"\"\"\n",
+        "    Degradação determinística de privacidade em um ataque ACU.\n",
+        "    \"\"\"\n",
+        "    prior = suc_prior_deterministic(data, sensitive_attr)\n",
+        "    post = suc_post_deterministic(data, qid_attrs, sensitive_attr)\n",
+        "    return post - prior\n",
+        "\n",
+        "def degradation_privacy_probabilistic(data, qid_attrs, sensitive_attr):\n",
+        "    \"\"\"\n",
+        "    Degradação probabilística de privacidade em um ataque ACU.\n",
+        "    \"\"\"\n",
+        "    prior = suc_prior_probabilistic(data, sensitive_attr)\n",
+        "    post = suc_post_probabilistic(data, qid_attrs, sensitive_attr)\n",
+        "    return post / prior if prior > 0 else 0"
+      ],
+      "metadata": {
+        "id": "yWHeOpL-25-Z"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##### IN_FINANCIAMENTO_ESTUDANTIL"
+      ],
+      "metadata": {
+        "id": "h45A9nbFI9hb"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "qid_attrs = ['CO_CURSO']\n",
+        "sensitive_attr = 'IN_FINANCIAMENTO_ESTUDANTIL'\n",
+        "data = microdados\n",
+        "\n",
+        "print(\"Sucesso determinístico a priori:\", suc_prior_deterministic(data, sensitive_attr))\n",
+        "print(\"Sucesso determinístico a posteriori:\", suc_post_deterministic(data, qid_attrs, sensitive_attr))\n",
+        "print(\"Degradação determinística de privacidade:\", degradation_privacy_deterministic(data, qid_attrs, sensitive_attr))\n",
+        "\n",
+        "print(\"Sucesso probabilístico a priori:\", suc_prior_probabilistic(data, sensitive_attr))\n",
+        "print(\"Sucesso probabilístico a posteriori:\", suc_post_probabilistic(data, qid_attrs, sensitive_attr))\n",
+        "print(\"Degradação probabilística de privacidade:\", degradation_privacy_probabilistic(data, qid_attrs, sensitive_attr))"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "N5b7mMQQ4rPh",
+        "outputId": "d3378d03-7e18-4b37-e543-2d40fa59f329"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Sucesso determinístico a priori: 0\n",
+            "Sucesso determinístico a posteriori: 0.25159520777727556\n",
+            "Degradação determinística de privacidade: 0.25159520777727556\n",
+            "Sucesso probabilístico a priori: 0.4737083804702005\n",
+            "Sucesso probabilístico a posteriori: 0.8288100901984822\n",
+            "Degradação probabilística de privacidade: 1.7496209152470759\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "qid_attrs = ['CO_MUNICIPIO_NASCIMENTO', 'CO_CURSO']\n",
+        "sensitive_attr = 'IN_FINANCIAMENTO_ESTUDANTIL'\n",
+        "data = microdados\n",
+        "\n",
+        "print(\"Sucesso determinístico a priori:\", suc_prior_deterministic(data, sensitive_attr))\n",
+        "print(\"Sucesso determinístico a posteriori:\", suc_post_deterministic(data, qid_attrs, sensitive_attr))\n",
+        "print(\"Degradação determinística de privacidade:\", degradation_privacy_deterministic(data, qid_attrs, sensitive_attr))\n",
+        "\n",
+        "print(\"Sucesso probabilístico a priori:\", suc_prior_probabilistic(data, sensitive_attr))\n",
+        "print(\"Sucesso probabilístico a posteriori:\", suc_post_probabilistic(data, qid_attrs, sensitive_attr))\n",
+        "print(\"Degradação probabilística de privacidade:\", degradation_privacy_probabilistic(data, qid_attrs, sensitive_attr))"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "VcVPcxZT9qmo",
+        "outputId": "96d9a213-1184-4014-97e4-ed749703133b"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Sucesso determinístico a priori: 0\n",
+            "Sucesso determinístico a posteriori: 0.31525201494209787\n",
+            "Degradação determinística de privacidade: 0.31525201494209787\n",
+            "Sucesso probabilístico a priori: 0.4737083804702005\n",
+            "Sucesso probabilístico a posteriori: 0.8540614845109434\n",
+            "Degradação probabilística de privacidade: 1.80292669440048\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "qid_attrs = ['NU_DIA_NASCIMENTO', 'NU_ANO_NASCIMENTO', 'CO_CURSO']\n",
+        "sensitive_attr = 'IN_FINANCIAMENTO_ESTUDANTIL'\n",
+        "data = microdados\n",
+        "\n",
+        "sucesso_priori_deterministic = suc_prior_deterministic(data, sensitive_attr)\n",
+        "sucesso_priori_probabilistic = suc_prior_probabilistic(data, sensitive_attr)\n",
+        "sucesso_post_deterministico = suc_post_deterministic(data, qid_attrs, sensitive_attr)\n",
+        "sucesso_post_probabilistico = suc_post_probabilistic(data, qid_attrs, sensitive_attr)\n",
+        "\n",
+        "print(\"Sucesso determinístico a priori:\", sucesso_priori_deterministic)\n",
+        "print(\"Sucesso determinístico a posteriori:\", sucesso_post_deterministico)\n",
+        "print(\"Degradação determinística de privacidade:\", sucesso_post_deterministico - sucesso_priori_deterministic)\n",
+        "\n",
+        "print(\"Sucesso probabilístico a priori:\", sucesso_priori_probabilistic)\n",
+        "print(\"Sucesso probabilístico a posteriori:\", sucesso_post_probabilistico)\n",
+        "print(\"Degradação probabilística de privacidade:\", sucesso_post_probabilistico / sucesso_priori_probabilistic)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "m6o_92BBPUlq",
+        "outputId": "3e339f1d-c064-40a9-a882-ea5a5bd78673"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Sucesso determinístico a priori: 0\n",
+            "Sucesso determinístico a posteriori: 0.7227774128919482\n",
+            "Degradação determinística de privacidade: 0.7227774128919482\n",
+            "Sucesso probabilístico a priori: 0.4737083804702005\n",
+            "Sucesso probabilístico a posteriori: 0.9138462471931771\n",
+            "Degradação probabilística de privacidade: 1.9291325314660848\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "qid_attrs = ['NU_DIA_NASCIMENTO', 'NU_MES_NASCIMENTO', 'NU_ANO_NASCIMENTO', 'CO_CURSO']\n",
+        "sensitive_attr = 'IN_FINANCIAMENTO_ESTUDANTIL'\n",
+        "data = microdados\n",
+        "\n",
+        "sucesso_priori_deterministic = suc_prior_deterministic(data, sensitive_attr)\n",
+        "sucesso_priori_probabilistic = suc_prior_probabilistic(data, sensitive_attr)\n",
+        "sucesso_post_deterministico = suc_post_deterministic(data, qid_attrs, sensitive_attr)\n",
+        "sucesso_post_probabilistico = suc_post_probabilistic(data, qid_attrs, sensitive_attr)\n",
+        "\n",
+        "print(\"Sucesso determinístico a priori:\", sucesso_priori_deterministic)\n",
+        "print(\"Sucesso determinístico a posteriori:\", sucesso_post_deterministico)\n",
+        "print(\"Degradação determinística de privacidade:\", sucesso_post_deterministico - sucesso_priori_deterministic)\n",
+        "\n",
+        "print(\"Sucesso probabilístico a priori:\", sucesso_priori_probabilistic)\n",
+        "print(\"Sucesso probabilístico a posteriori:\", sucesso_post_probabilistico)\n",
+        "print(\"Degradação probabilística de privacidade:\", sucesso_post_probabilistico / sucesso_priori_probabilistic)"
+      ],
+      "metadata": {
+        "id": "Y5BJ27TPiUec",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "f7947d41-79e0-45ad-9a97-8dc125504861"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Sucesso determinístico a priori: 0\n",
+            "Sucesso determinístico a posteriori: 0.9241651629578265\n",
+            "Degradação determinística de privacidade: 0.9241651629578265\n",
+            "Sucesso probabilístico a priori: 0.4737083804702005\n",
+            "Sucesso probabilístico a posteriori: 0.9710487836167835\n",
+            "Degradação probabilística de privacidade: 2.049887280129867\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "qid_attrs = ['NU_DIA_NASCIMENTO', 'NU_MES_NASCIMENTO', 'NU_ANO_NASCIMENTO', 'CO_MUNICIPIO_NASCIMENTO', 'CO_CURSO']\n",
+        "sensitive_attr = 'IN_FINANCIAMENTO_ESTUDANTIL'\n",
+        "data = microdados\n",
+        "\n",
+        "sucesso_priori_deterministic = suc_prior_deterministic(data, sensitive_attr)\n",
+        "sucesso_priori_probabilistic = suc_prior_probabilistic(data, sensitive_attr)\n",
+        "sucesso_post_deterministico = suc_post_deterministic(data, qid_attrs, sensitive_attr)\n",
+        "sucesso_post_probabilistico = suc_post_probabilistic(data, qid_attrs, sensitive_attr)\n",
+        "\n",
+        "print(\"Sucesso determinístico a priori:\", sucesso_priori_deterministic)\n",
+        "print(\"Sucesso determinístico a posteriori:\", sucesso_post_deterministico)\n",
+        "print(\"Degradação determinística de privacidade:\", sucesso_post_deterministico - sucesso_priori_deterministic)\n",
+        "\n",
+        "print(\"Sucesso probabilístico a priori:\", sucesso_priori_probabilistic)\n",
+        "print(\"Sucesso probabilístico a posteriori:\", sucesso_post_probabilistico)\n",
+        "print(\"Degradação probabilística de privacidade:\", sucesso_post_probabilistico / sucesso_priori_probabilistic)"
+      ],
+      "metadata": {
+        "id": "UEKm0Sm73_E7"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##### IN_DEFICIENCIA"
+      ],
+      "metadata": {
+        "id": "4CdJ5WwAJBT_"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "qid_attrs = ['CO_CURSO']\n",
+        "sensitive_attr = 'IN_DEFICIENCIA'\n",
+        "data = microdados\n",
+        "\n",
+        "print(\"Sucesso determinístico a priori:\", suc_prior_deterministic(data, sensitive_attr))\n",
+        "print(\"Sucesso determinístico a posteriori:\", suc_post_deterministic(data, qid_attrs, sensitive_attr))\n",
+        "print(\"Degradação determinística de privacidade:\", degradation_privacy_deterministic(data, qid_attrs, sensitive_attr))\n",
+        "\n",
+        "print(\"Sucesso probabilístico a priori:\", suc_prior_probabilistic(data, sensitive_attr))\n",
+        "print(\"Sucesso probabilístico a posteriori:\", suc_post_probabilistic(data, qid_attrs, sensitive_attr))\n",
+        "print(\"Degradação probabilística de privacidade:\", degradation_privacy_probabilistic(data, qid_attrs, sensitive_attr))"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "g3LpFQmjnKVZ",
+        "outputId": "023cfc66-38d4-49ad-8139-883d091d02f3"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Sucesso determinístico a priori: 0\n",
+            "Sucesso determinístico a posteriori: 0.15459301541002116\n",
+            "Degradação determinística de privacidade: 0.15459301541002116\n",
+            "Sucesso probabilístico a priori: 0.9403696085343882\n",
+            "Sucesso probabilístico a posteriori: 0.9732570597083633\n",
+            "Degradação probabilística de privacidade: 1.0349728988213813\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "qid_attrs = ['CO_MUNICIPIO_NASCIMENTO', 'CO_CURSO']\n",
+        "sensitive_attr = 'IN_DEFICIENCIA'\n",
+        "data = microdados\n",
+        "\n",
+        "print(\"Sucesso determinístico a priori:\", suc_prior_deterministic(data, sensitive_attr))\n",
+        "print(\"Sucesso determinístico a posteriori:\", suc_post_deterministic(data, qid_attrs, sensitive_attr))\n",
+        "print(\"Degradação determinística de privacidade:\", degradation_privacy_deterministic(data, qid_attrs, sensitive_attr))\n",
+        "\n",
+        "print(\"Sucesso probabilístico a priori:\", suc_prior_probabilistic(data, sensitive_attr))\n",
+        "print(\"Sucesso probabilístico a posteriori:\", suc_post_probabilistic(data, qid_attrs, sensitive_attr))\n",
+        "print(\"Degradação probabilística de privacidade:\", degradation_privacy_probabilistic(data, qid_attrs, sensitive_attr))"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "APepcA2rmWuK",
+        "outputId": "cd522dad-1a8f-4521-bf86-df1820fd58f1"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Sucesso determinístico a priori: 0\n",
+            "Sucesso determinístico a posteriori: 0.45221248915863616\n",
+            "Degradação determinística de privacidade: 0.45221248915863616\n",
+            "Sucesso probabilístico a priori: 0.9403696085343882\n",
+            "Sucesso probabilístico a posteriori: 0.9784216047188571\n",
+            "Degradação probabilística de privacidade: 1.0404649361688483\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "qid_attrs = ['NU_DIA_NASCIMENTO', 'CO_CURSO']\n",
+        "sensitive_attr = 'IN_DEFICIENCIA'\n",
+        "data = microdados\n",
+        "\n",
+        "sucesso_priori_deterministic = suc_prior_deterministic(data, sensitive_attr)\n",
+        "sucesso_priori_probabilistic = suc_prior_probabilistic(data, sensitive_attr)\n",
+        "sucesso_post_deterministico = suc_post_deterministic(data, qid_attrs, sensitive_attr)\n",
+        "sucesso_post_probabilistico = suc_post_probabilistic(data, qid_attrs, sensitive_attr)\n",
+        "\n",
+        "print(\"Sucesso determinístico a priori:\", sucesso_priori_deterministic)\n",
+        "print(\"Sucesso determinístico a posteriori:\", sucesso_post_deterministico)\n",
+        "print(\"Degradação determinística de privacidade:\", sucesso_post_deterministico - sucesso_priori_deterministic)\n",
+        "\n",
+        "print(\"Sucesso probabilístico a priori:\", sucesso_priori_probabilistic)\n",
+        "print(\"Sucesso probabilístico a posteriori:\", sucesso_post_probabilistico)\n",
+        "print(\"Degradação probabilística de privacidade:\", sucesso_post_probabilistico / sucesso_priori_probabilistic)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "nyW434ihPpMu",
+        "outputId": "b4f93418-6ea2-43d6-a006-ddbbc2a9caaa"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Sucesso determinístico a priori: 0\n",
+            "Sucesso determinístico a posteriori: 0.6583656759068338\n",
+            "Degradação determinística de privacidade: 0.6583656759068338\n",
+            "Sucesso probabilístico a priori: 0.9403696085343882\n",
+            "Sucesso probabilístico a posteriori: 0.9749169433833158\n",
+            "Degradação probabilística de privacidade: 1.0367380384642282\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "qid_attrs = ['NU_DIA_NASCIMENTO', 'NU_ANO_NASCIMENTO', 'CO_CURSO']\n",
+        "sensitive_attr = 'IN_DEFICIENCIA'\n",
+        "data = microdados\n",
+        "\n",
+        "sucesso_priori_deterministic = suc_prior_deterministic(data, sensitive_attr)\n",
+        "sucesso_priori_probabilistic = suc_prior_probabilistic(data, sensitive_attr)\n",
+        "sucesso_post_deterministico = suc_post_deterministic(data, qid_attrs, sensitive_attr)\n",
+        "sucesso_post_probabilistico = suc_post_probabilistic(data, qid_attrs, sensitive_attr)\n",
+        "\n",
+        "print(\"Sucesso determinístico a priori:\", sucesso_priori_deterministic)\n",
+        "print(\"Sucesso determinístico a posteriori:\", sucesso_post_deterministico)\n",
+        "print(\"Degradação determinística de privacidade:\", sucesso_post_deterministico - sucesso_priori_deterministic)\n",
+        "\n",
+        "print(\"Sucesso probabilístico a priori:\", sucesso_priori_probabilistic)\n",
+        "print(\"Sucesso probabilístico a posteriori:\", sucesso_post_probabilistico)\n",
+        "print(\"Degradação probabilística de privacidade:\", sucesso_post_probabilistico / sucesso_priori_probabilistic)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "RGnaeJGliCu5",
+        "outputId": "d1314694-0f5f-4cc9-f9e3-33e2a67e9827"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Sucesso determinístico a priori: 0\n",
+            "Sucesso determinístico a posteriori: 0.9454647836153036\n",
+            "Degradação determinística de privacidade: 0.9454647836153036\n",
+            "Sucesso probabilístico a priori: 0.9403696085343882\n",
+            "Sucesso probabilístico a posteriori: 0.9891900376271747\n",
+            "Degradação probabilística de privacidade: 1.0519162132099054\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "qid_attrs = ['NU_DIA_NASCIMENTO', 'NU_MES_NASCIMENTO', 'NU_ANO_NASCIMENTO', 'CO_CURSO']\n",
+        "sensitive_attr = 'IN_DEFICIENCIA'\n",
+        "data = microdados\n",
+        "\n",
+        "sucesso_priori_deterministic = suc_prior_deterministic(data, sensitive_attr)\n",
+        "sucesso_priori_probabilistic = suc_prior_probabilistic(data, sensitive_attr)\n",
+        "sucesso_post_deterministico = suc_post_deterministic(data, qid_attrs, sensitive_attr)\n",
+        "sucesso_post_probabilistico = suc_post_probabilistic(data, qid_attrs, sensitive_attr)\n",
+        "\n",
+        "print(\"Sucesso determinístico a priori:\", sucesso_priori_deterministic)\n",
+        "print(\"Sucesso determinístico a posteriori:\", sucesso_post_deterministico)\n",
+        "print(\"Degradação determinística de privacidade:\", sucesso_post_deterministico - sucesso_priori_deterministic)\n",
+        "\n",
+        "print(\"Sucesso probabilístico a priori:\", sucesso_priori_probabilistic)\n",
+        "print(\"Sucesso probabilístico a posteriori:\", sucesso_post_probabilistico)\n",
+        "print(\"Degradação probabilística de privacidade:\", sucesso_post_probabilistico / sucesso_priori_probabilistic)"
+      ],
+      "metadata": {
+        "id": "uQrFBQ_k3rCW"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
