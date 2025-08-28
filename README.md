@@ -10,7 +10,7 @@ Todos os códigos foram desenvolvidos no **Google Colab** e estão disponíveis 
 ## Estrutura dos Códigos
 
 ### Código Complementar
-- **Objetivo:** Replicar os resultados obtidos no TED utilizando inteligência artificial (IA).  
+- **Objetivo:** Replicar os resultados obtidos no TED utilizando um código desenvolvido a partir dos anexos matemáticos do TED 8750 - PRICE.  
 - **Descrição:** Implementa métricas de inferência de atributos baseadas em quase-identificadores, simulando ataques em que um adversário tenta adivinhar valores de atributos sensíveis.
 
 ### Experimento 1 
