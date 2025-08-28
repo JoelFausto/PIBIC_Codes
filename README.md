@@ -3,8 +3,6 @@
 Este repositório reúne os códigos e scripts do trabalho de pesquisa **“Implicações da Lei Geral de Proteção de Dados Pessoais na Mineração de Dados Abertos Educacionais”**.  
 O projeto investiga desafios e soluções para o uso de dados abertos educacionais em conformidade com a LGPD, incluindo análises e resultados obtidos.
 
-Todos os códigos foram desenvolvidos no **Google Colab** e estão disponíveis aqui diretamente do ambiente.
-
 ---
 
 ## Estrutura dos Códigos
